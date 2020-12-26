@@ -6,34 +6,34 @@
 #include <delay.h>
 //#include "lcd.h"
 
-#define Trigger         PORTE.0 //ÃÊÀ½ÆÄ Æ®¸®°Å
-#define Echo            PINE.1 //ÃÊÀ½ÆÄ ¿¡ÄÚ
+#define Trigger         PORTE.0 //ì´ˆìŒíŒŒ íŠ¸ë¦¬ê±°
+#define Echo            PINE.1 //ì´ˆìŒíŒŒ ì—ì½”
 
-unsigned int range; // °Å¸® º¯¼ö(cm)
-unsigned int TCNT3; // Å¸ÀÌ¸Ó/Ä«¿îÅÍ3 16ºñÆ® °ª ÀúÀå ·¹Áö½ºÅÍ
+unsigned int range; // ê±°ë¦¬ ë³€ìˆ˜(cm)
+unsigned int TCNT3; // íƒ€ì´ë¨¸/ì¹´ìš´í„°3 16ë¹„íŠ¸ ê°’ ì €ì¥ ë ˆì§€ìŠ¤í„°
 int close_count = 0; 
 //unsigned char Sonic_Decimal[3];
 
 void getEcho(void){
-    while(!Echo);     // ¿¡ÄÚÇÉÀÌ High Edge°¡ µÉ ¶§±îÁö ´ë±â
-    TCNT3H = 0;       // TCNT3 »óÀ§ ¹ÙÀÌÆ®
-    TCNT3L = 0;       // TCNT3 ÇÏÀ§ ¹ÙÀÌÆ®
-    TCCR3B=2;         // Å¸ÀÌ¸Ó/Ä«¿îÅÍ3 8ºĞÁÖºñ
-    while(Echo);      // ¿¡ÄÚ ÇÉÀÌ Low Edge°¡ µÉ ¶§±îÁö ´ë±â
-    TCNT3 = TCNT3L | (TCNT3H << 8); // TCNT3¿¡ ÇÏÀ§¹ÙÀÌÆ®, »óÀ§¹ÙÀÌÆ® ¼øÀ¸·Î ÀÔ·Â 
-    TCCR3B=8;                       // Å¸ÀÌ¸Ó/Ä«¿îÅÍ3 µ¿ÀÛ Á¤Áö (CTC ¸ğµå)
-    range = TCNT3/116;              // 116clk = 58us, ÃÊÀ½ÆÄ¼¾¼­´Â 1cm¸¦ 58us·Î ÃøÁ¤
-                                    // Å¸ÀÌ¸Ó Å¬·°Àº 8ºĞÁÖ, 0.5us¸¶´Ù TCNT°ª 1¾¿ Áõ°¡
+    while(!Echo);     // ì—ì½”í•€ì´ High Edgeê°€ ë  ë•Œê¹Œì§€ ëŒ€ê¸°
+    TCNT3H = 0;       // TCNT3 ìƒìœ„ ë°”ì´íŠ¸
+    TCNT3L = 0;       // TCNT3 í•˜ìœ„ ë°”ì´íŠ¸
+    TCCR3B=2;         // íƒ€ì´ë¨¸/ì¹´ìš´í„°3 8ë¶„ì£¼ë¹„
+    while(Echo);      // ì—ì½” í•€ì´ Low Edgeê°€ ë  ë•Œê¹Œì§€ ëŒ€ê¸°
+    TCNT3 = TCNT3L | (TCNT3H << 8); // TCNT3ì— í•˜ìœ„ë°”ì´íŠ¸, ìƒìœ„ë°”ì´íŠ¸ ìˆœìœ¼ë¡œ ì…ë ¥ 
+    TCCR3B=8;                       // íƒ€ì´ë¨¸/ì¹´ìš´í„°3 ë™ì‘ ì •ì§€ (CTC ëª¨ë“œ)
+    range = TCNT3/116;              // 116clk = 58us, ì´ˆìŒíŒŒì„¼ì„œëŠ” 1cmë¥¼ 58usë¡œ ì¸¡ì •
+                                    // íƒ€ì´ë¨¸ í´ëŸ­ì€ 8ë¶„ì£¼, 0.5usë§ˆë‹¤ TCNTê°’ 1ì”© ì¦ê°€
     if(range<10)
     {
-      close_count++;  
+      close_count++; // 10cmë³´ë‹¤ ì‘ì€ ë²”ìœ„ ê°ì§€ì‹œ   
     } 
 }
 
 void Init_HC_SR04()
 {
 	DDRE = 0x01; // PC0 ouput Trigger, PC1 input Echo
-	TCCR3A=0; TCCR3B=0x08; // TCNT ·¹Áö½ºÅÍ ÃÊ±âÈ­, ÇöÀç CTC¸ğµå·Î Á¤Áö »óÅÂ
+	TCCR3A=0; TCCR3B=0x08; // TCNT ë ˆì§€ìŠ¤í„° ì´ˆê¸°í™”, í˜„ì¬ CTCëª¨ë“œë¡œ ì •ì§€ ìƒíƒœ
 	delay_ms(100);
 		
 }
