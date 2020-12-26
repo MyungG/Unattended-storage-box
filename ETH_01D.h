@@ -14,22 +14,22 @@
 #define TWSR_TWI_RESTART 0x10
 #define MR_DATA_NACK 0x58
 
-unsigned short int T_humidity=0, T_temperature=0; // ½ÇÁ¦°ªÀ¸·Î º¯È¯µÈ ½Àµµ°ª°ú ¿Âµµ°ªÀ» ÀúÀåÇÏ±â À§ÇÑ º¯¼ö
-unsigned char ETH_addr = 0x88;      // ÃøÁ¤ÇÏ°íÀÚ ÇÏ´Â ÀåÄ¡ ÁÖ 
+unsigned short int T_humidity=0, T_temperature=0; // ì‹¤ì œê°’ìœ¼ë¡œ ë³€í™˜ëœ ìŠµë„ê°’ê³¼ ì˜¨ë„ê°’ì„ ì €ì¥í•˜ê¸° ìœ„í•œ ë³€ìˆ˜
+unsigned char ETH_addr = 0x88;      // ì¸¡ì •í•˜ê³ ì í•˜ëŠ” ì¥ì¹˜ ì£¼ 
 
 
-// I2C Å¬·°ÁÖÆÄ¼ö ¼³Á¤
+// I2C í´ëŸ­ì£¼íŒŒìˆ˜ ì„¤ì •
 void I2C_Init(void)
 {
     TWBR = 0x0c; // 400kHz I2C clock frequency
 }
 
-//»óÅÂ ÄÚµå È®ÀÎÇÔ¼ö
+//ìƒíƒœ ì½”ë“œ í™•ì¸í•¨ìˆ˜
 unsigned char TWI_TransCheck_ACK(unsigned char Stat)
 { 
     char str[10];
     unsigned int ExtDev_ErrCnt = 0;
-    while(!(TWCR & (1<<TWINT)))         // ÆĞÅ¶ Àü¼Û ¿Ï·áµÉ ¶§ ±îÁö  wait
+    while(!(TWCR & (1<<TWINT)))         // íŒ¨í‚· ì „ì†¡ ì™„ë£Œë  ë•Œ ê¹Œì§€  wait
     { 
         if(ExtDev_ErrCnt++ > ExtDev_ERR_MAX_CNT){ return 1; }
     }      
@@ -44,66 +44,66 @@ unsigned char TWI_TransCheck_ACK(unsigned char Stat)
         LCD_Str(str);
         delay_ms(1000);
                     
-        return 2;  // Àü¼Û °Ë»ç(ACK) : error½Ã 2 ¹İÈ¯  
+        return 2;  // ì „ì†¡ ê²€ì‚¬(ACK) : errorì‹œ 2 ë°˜í™˜  
     } 
         
     else return 0;
                
 }
 
-// START Àü¼Û 
+// START ì „ì†¡ 
 unsigned char TWI_Start()
 {
-    TWCR = ((1<<TWINT) | (1<<TWSTA) | (1<<TWEN));   // START ½ÅÈ£ Àü¼Û
-    while(!(TWCR & (1<<TWINT)));                    // START ½ÅÈ£ Àü¼Û ¿Ï·áµÉ ¶§ ±îÁö wait
+    TWCR = ((1<<TWINT) | (1<<TWSTA) | (1<<TWEN));   // START ì‹ í˜¸ ì „ì†¡
+    while(!(TWCR & (1<<TWINT)));                    // START ì‹ í˜¸ ì „ì†¡ ì™„ë£Œë  ë•Œ ê¹Œì§€ wait
     return TWI_TransCheck_ACK(TWSR_TWI_START);    
 }
 
-// STOP Àü¼Û 
+// STOP ì „ì†¡ 
 void TWI_Stop()
 {
-    TWCR = ((1<<TWINT) | (1<<TWSTO) | (1<<TWEN));   // STOP ½ÅÈ£ º¸³»±â
+    TWCR = ((1<<TWINT) | (1<<TWSTO) | (1<<TWEN));   // STOP ì‹ í˜¸ ë³´ë‚´ê¸°
 }       
 
-// SLA+W ÆĞÅ¶ Àü¼Û
+// SLA+W íŒ¨í‚· ì „ì†¡
 unsigned char TWI_Write_SLAW(unsigned char Addr)
 {
     unsigned char ret_err=0;
-    TWDR = Addr;                        // SLA + W ÆĞÅ¶(½½·¹ÀÌºê ÁÖ¼Ò+Wirte bit(Low))
-    TWCR = (1<<TWINT) | (1<<TWEN);      // SLA + W ÆĞÅ¶ º¸³»±â      
+    TWDR = Addr;                        // SLA + W íŒ¨í‚·(ìŠ¬ë ˆì´ë¸Œ ì£¼ì†Œ+Wirte bit(Low))
+    TWCR = (1<<TWINT) | (1<<TWEN);      // SLA + W íŒ¨í‚· ë³´ë‚´ê¸°      
     return TWI_TransCheck_ACK(MT_SLA_ACK); 
 }
 
-// SLA_R ÆĞÅ¶ Àü¼Û
+// SLA_R íŒ¨í‚· ì „ì†¡
 unsigned char TWI_Write_SLAR(unsigned char Addr)
 {
     unsigned char ret_err=0;
-    TWDR = Addr+1;                  // SLA + R ÆĞÅ¶(½½·¹ÀÌºê ÁÖ¼Ò+Read bit(High))
-    TWCR = (1<<TWINT) | (1<<TWEN);  // SLA + R ÆĞÅ¶ º¸³»±â 
+    TWDR = Addr+1;                  // SLA + R íŒ¨í‚·(ìŠ¬ë ˆì´ë¸Œ ì£¼ì†Œ+Read bit(High))
+    TWCR = (1<<TWINT) | (1<<TWEN);  // SLA + R íŒ¨í‚· ë³´ë‚´ê¸° 
     return TWI_TransCheck_ACK(MR_SLA_ACK);     
 }    
 
-// write ÆĞÅ¶ Àü¼Û
+// write íŒ¨í‚· ì „ì†¡
 unsigned char ETH_01D_I2C_Write(unsigned char address)
 { 
     unsigned char ret_err=0;     
     
-    ret_err = TWI_Start();              // I2C ½ÃÀÛ ºñÆ® Àü¼Û  
+    ret_err = TWI_Start();              // I2C ì‹œì‘ ë¹„íŠ¸ ì „ì†¡  
             
-    ret_err = TWI_Write_SLAW(address);  // SLAW ÆĞÅ¶ Àü¼Û  
-    if(ret_err != 0) return ret_err;    // error½Ã Á¾·á   
-    TWI_Stop();                         // I2C Á¾·áºñÆ® Àü¼Û 
+    ret_err = TWI_Write_SLAW(address);  // SLAW íŒ¨í‚· ì „ì†¡  
+    if(ret_err != 0) return ret_err;    // errorì‹œ ì¢…ë£Œ   
+    TWI_Stop();                         // I2C ì¢…ë£Œë¹„íŠ¸ ì „ì†¡ 
      
-    return 0;                           // Á¤»ó Á¾·á                                
+    return 0;                           // ì •ìƒ ì¢…ë£Œ                                
 }
 
 void startRanging(char addr)
 {
-    // ¿Â½Àµµ ÃøÁ¤ ¿äÃ»
+    // ì˜¨ìŠµë„ ì¸¡ì • ìš”ì²­
     ETH_01D_I2C_Write(addr);
 }
 
-// µ¥ÀÌÅÍ 1¹ÙÀÌÆ® ¼ö½ÅÈÄ Ack½ÅÈ£ Àü¼Û
+// ë°ì´í„° 1ë°”ì´íŠ¸ ìˆ˜ì‹ í›„ Ackì‹ í˜¸ ì „ì†¡
 unsigned char TWI_Read_Data_Aak(unsigned char* Data)
 {   
     unsigned char ret_err=0;
@@ -112,11 +112,11 @@ unsigned char TWI_Read_Data_Aak(unsigned char* Data)
     ret_err = TWI_TransCheck_ACK(MR_DATA_ACK);
     if(ret_err != 0) 
         return ret_err;
-    *Data = TWDR;           // no error, return ¼ö½Å µ¥ÀÌÅÍ(Æ÷ÀÎÅÍ·Î)        
-    return 0;               // Á¤»ó Á¾·á 
+    *Data = TWDR;           // no error, return ìˆ˜ì‹  ë°ì´í„°(í¬ì¸í„°ë¡œ)        
+    return 0;               // ì •ìƒ ì¢…ë£Œ 
 }
 
-// µ¥ÀÌÅÍ 1¹ÙÀÌÆ® ¼ö½ÅÈÄ Nack½ÅÈ£ Àü¼Û
+// ë°ì´í„° 1ë°”ì´íŠ¸ ìˆ˜ì‹ í›„ Nackì‹ í˜¸ ì „ì†¡
 unsigned char TWI_Read_Data_Nack(unsigned char* Data)
 {   
     unsigned char ret_err=0;
@@ -125,11 +125,11 @@ unsigned char TWI_Read_Data_Nack(unsigned char* Data)
     ret_err = TWI_TransCheck_ACK(MR_DATA_NACK);
     if(ret_err != 0) 
         return ret_err;
-    *Data = TWDR;           // no error, return ¼ö½Å µ¥ÀÌÅÍ(Æ÷ÀÎÅÍ·Î)        
-    return 0;               // Á¤»ó Á¾·á 
+    *Data = TWDR;           // no error, return ìˆ˜ì‹  ë°ì´í„°(í¬ì¸í„°ë¡œ)        
+    return 0;               // ì •ìƒ ì¢…ë£Œ 
 }
 
-// ¹ŞÀº µ¥ÀÌÅÍ°ª ½ÇÁ¦°ªÀ¸·Î º¯È¯
+// ë°›ì€ ë°ì´í„°ê°’ ì‹¤ì œê°’ìœ¼ë¡œ ë³€í™˜
 void Trans_Data(unsigned short int Humidity, unsigned short int Temperature)
 {
 
@@ -139,11 +139,11 @@ void Trans_Data(unsigned short int Humidity, unsigned short int Temperature)
                      
 }
 
-// RESTART Àü¼Û 
+// RESTART ì „ì†¡ 
 unsigned char TWI_Restart()
 {
     unsigned char ret_err=0;
-    TWCR = ((1<<TWINT) | (1<<TWSTA) | (1<<TWEN));   // Restart ½ÅÈ£ Àü¼Û
+    TWCR = ((1<<TWINT) | (1<<TWSTA) | (1<<TWEN));   // Restart ì‹ í˜¸ ì „ì†¡
     return TWI_TransCheck_ACK(TWSR_TWI_RESTART);                 
 }  
 
@@ -155,45 +155,45 @@ unsigned int ETH_01D_I2C_Read(char address)
     unsigned int ETH_Data=0;
     unsigned char read_data = 0;
     
-    ret_err = TWI_Start();              // Start Àü¼Û
+    ret_err = TWI_Start();              // Start ì „ì†¡
     
-    ret_err = TWI_Write_SLAR(ETH_addr);     // SLAR ÆĞÅ¶ Àü¼Û
-    if(ret_err != 0) return ret_err;    // error½Ã Á¾·á
+    ret_err = TWI_Write_SLAR(ETH_addr);     // SLAR íŒ¨í‚· ì „ì†¡
+    if(ret_err != 0) return ret_err;    // errorì‹œ ì¢…ë£Œ
        
-    ret_err = TWI_Read_Data_Aak(&read_data); // ·¹Áö½ºÅÍ µ¥ÀÌÅÍ ¼ö½Å
-    if(ret_err != 0) return ret_err;        // error½Ã Á¾·á
-    Humidity = read_data<<8;               // Humidity »óÀ§ ¹ÙÀÌÆ® ÀúÀå
+    ret_err = TWI_Read_Data_Aak(&read_data); // ë ˆì§€ìŠ¤í„° ë°ì´í„° ìˆ˜ì‹ 
+    if(ret_err != 0) return ret_err;        // errorì‹œ ì¢…ë£Œ
+    Humidity = read_data<<8;               // Humidity ìƒìœ„ ë°”ì´íŠ¸ ì €ì¥
         
-    ret_err = TWI_Read_Data_Aak(&read_data); // ·¹Áö½ºÅÍ µ¥ÀÌÅÍ ¼ö½Å
-    if(ret_err != 0) return ret_err;        // error½Ã Á¾·á
-    Humidity |= read_data;                  // Humidity ÇÏÀ§ ¹ÙÀÌÆ® ÀúÀå
+    ret_err = TWI_Read_Data_Aak(&read_data); // ë ˆì§€ìŠ¤í„° ë°ì´í„° ìˆ˜ì‹ 
+    if(ret_err != 0) return ret_err;        // errorì‹œ ì¢…ë£Œ
+    Humidity |= read_data;                  // Humidity í•˜ìœ„ ë°”ì´íŠ¸ ì €ì¥
         
-    ret_err = TWI_Read_Data_Aak(&read_data); // ·¹Áö½ºÅÍ µ¥ÀÌÅÍ ¼ö½Å
-    if(ret_err != 0) return ret_err;        // error½Ã Á¾·á
-    Temperature = read_data<<8;             // Temperature »óÀ§ ¹ÙÀÌÆ® ÀúÀå
+    ret_err = TWI_Read_Data_Aak(&read_data); // ë ˆì§€ìŠ¤í„° ë°ì´í„° ìˆ˜ì‹ 
+    if(ret_err != 0) return ret_err;        // errorì‹œ ì¢…ë£Œ
+    Temperature = read_data<<8;             // Temperature ìƒìœ„ ë°”ì´íŠ¸ ì €ì¥
         
-    ret_err = TWI_Read_Data_Nack(&read_data); // ·¹Áö½ºÅÍ µ¥ÀÌÅÍ ¼ö½Å
-    if(ret_err != 0) return ret_err;          // error½Ã Á¾·á
-    Temperature |= read_data;                 // Temperature ÇÏÀ§ ¹ÙÀÌÆ® ÀúÀå
+    ret_err = TWI_Read_Data_Nack(&read_data); // ë ˆì§€ìŠ¤í„° ë°ì´í„° ìˆ˜ì‹ 
+    if(ret_err != 0) return ret_err;          // errorì‹œ ì¢…ë£Œ
+    Temperature |= read_data;                 // Temperature í•˜ìœ„ ë°”ì´íŠ¸ ì €ì¥
            
-    TWI_Stop();                               // STOP ½ÅÈ£ Àü¼Û
+    TWI_Stop();                               // STOP ì‹ í˜¸ ì „ì†¡
     
-    Humidity = (Humidity&0x3fff);       // Humidity »óÀ§ ¹ÙÀÌÆ® ÃÖ»óÀ§ 2bit µ·ÄÉ¾î Ã³¸®
-    Temperature = (Temperature&0xfffc); // Temperature ÇÏÀ§ ¹ÙÀÌÆ® ÃÖÇÏÀ§ 2bit µ·ÄÉ¾î Ã³¸®
+    Humidity = (Humidity&0x3fff);       // Humidity ìƒìœ„ ë°”ì´íŠ¸ ìµœìƒìœ„ 2bit ëˆì¼€ì–´ ì²˜ë¦¬
+    Temperature = (Temperature&0xfffc); // Temperature í•˜ìœ„ ë°”ì´íŠ¸ ìµœí•˜ìœ„ 2bit ëˆì¼€ì–´ ì²˜ë¦¬
     
-    Trans_Data(Humidity,Temperature);   // ½ÇÁ¦°ªÀ¸·Î º¯È¯
+    Trans_Data(Humidity,Temperature);   // ì‹¤ì œê°’ìœ¼ë¡œ ë³€í™˜
     
-    return ETH_Data;                           // Á¤»ó Á¾·á 
+    return ETH_Data;                           // ì •ìƒ ì¢…ë£Œ 
 }
 
-unsigned char ti_Cnt_1ms;     // 1ms ´ÜÀ§ ½Ã°£ °è¼ö À§ÇÑ Àü¿ª º¯¼ö¼±¾ğ   
+unsigned char ti_Cnt_1ms;     // 1ms ë‹¨ìœ„ ì‹œê°„ ê³„ìˆ˜ ìœ„í•œ ì „ì—­ ë³€ìˆ˜ì„ ì–¸   
 unsigned char LCD_DelCnt_1ms; 
 
 void Timer2_Init(){
     TCCR2 = (1<<WGM21)|(1<<CS20)|(0<<CS21)|(1<<CS22); //CTCëª¨ë“œ, 1024ë¶„ì£¼
     TCNT2 = 0x00;
-    OCR2  = 15; // 16Mhz / 1024ë¶„ì£¼ / 15ë‹¨ê³„ = 1.041kHz 
-    TIMSK = (1<<OCIE2);// ë¹„êµì¼ì¹˜ ì¸í„°ëŸ½íŠ¸ í—ˆê°€   
+    OCR2  = 15; // 16Mhz / 1024 / 15 = 1.041kHz 
+    TIMSK = (1<<OCIE2);// ë¹„êµì¼ì¹˜ ì¸í„°ëŸ½íŠ¸ í—ˆìš©  
 }
 
 interrupt[TIM2_COMP] void timer2_comp(void)
